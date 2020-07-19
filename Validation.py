@@ -29,7 +29,7 @@ File = sg.popup_get_file('Please select the .csv file for analyzing')
 data = pd.read_csv(File, header = 0, keep_default_na = False)
 
 #data = pd.read_csv('C:/Users/julie/GitHub/Validation/VelocityDataNew.csv',header = 0,
-         #        keep_default_na = False) #Keep athlete 'NA' from becoming NaNs
+              #  keep_default_na = False) #Keep athlete 'NA' from becoming NaNs
 
 #Sorting the data by athlete and trial in ascending order
 data.sort_values(['Athlete', 'Trial'], inplace = True, ascending = [True, True])
@@ -52,7 +52,6 @@ NewData.plot(x = "Athlete", y = ["Radar_Avg", "TimingGate_Avg", "Optojump_Avg"],
              kind = "bar", title = 'Average', rot = 45,
              legend = False, cmap = "Accent", fontsize = 26)
 fig1.legend(['Radar', 'Timing Gate', 'Optojump'], loc = 'upper right', frameon = False, fontsize = 26)
-fig1.savefig('Max and avg velocity plot', bbox_inches = 'tight')
 
 for ax in axes.flat:
     ax.set_ylabel('Velocity (m/s)', fontsize = 26)
@@ -62,6 +61,37 @@ for ax in axes.flat:
     ax.title.set_size(26)
 for ax in axes.flat:
     ax.label_outer()
+plt.show()
 
+#Bland Altman plots
+import statsmodels.api as sm
+fig2, ax = plt.subplots(1, figsize = (8,5))
+sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Radar_Max'], ax = ax)
+plt.title('Timing Gate and Radar Bland Altman plot', fontsize = 18)
+plt.show()   
+fig3, ax = plt.subplots(1, figsize = (8,5))
+sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Optojump_Max'], ax = ax)
+plt.title('Timing Gate and Optojump Bland Altman plot', fontsize = 18)
+plt.show()   
 
+#ICC table
+import pingouin as pg
+ICCRadar = pd.DataFrame()
+ICCRadar['Athlete'] = NewData['Athlete']
+ICCRadar['TimingGate'] = NewData['TimingGate_Max']
+ICCRadar['Radar'] = NewData['Radar_Max']
+ICCRadar = ICCRadar.melt(id_vars = ['Athlete'])
+ICCRadar.sort_values('Athlete', inplace = True, ascending = True)
 
+ICCOpto = pd.DataFrame()
+ICCOpto['Athlete'] = NewData['Athlete']
+ICCOpto['TimingGate'] = NewData['TimingGate_Max']
+ICCOpto['Optojump'] = NewData['Optojump_Max']
+ICCOpto = ICCOpto.melt(id_vars = ['Athlete'])
+ICCOpto.sort_values('Athlete', inplace = True, ascending = True)
+
+iccRadar = pg.intraclass_corr(data = ICCRadar, targets = 'variable', raters = 'Athlete', ratings = 'value'  )
+iccOpto = pg.intraclass_corr(data = ICCOpto, targets = 'variable', raters = 'Athlete', ratings = 'value'  )
+
+print(iccRadar)
+print(iccOpto)
