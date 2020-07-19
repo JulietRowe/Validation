@@ -18,18 +18,18 @@ get_ipython().magic('clear')
 sg.theme('LightBlue2')
 
 sg.popup_ok('The following program was designed to analyze athlete data for the validation of timing gates', 
-            title = 'Timing Gate Validation')
+           title = 'Timing Gate Validation')
 sg.popup_ok_cancel('This program will prompt you to upload a .csv file. Follow these instructions carefully as everything is case sensitive! This file MUST be formatted in the following way:',
-            ' - Five columns', ' - One row containing column names',
-            ' - Column names: Athlete, Trial, Radar, TimingGate, Optojump',
-            title = 'Instructions')
+           ' - Five columns', ' - One row containing column names',
+           ' - Column names: Athlete, Trial, Radar, TimingGate, Optojump',
+           title = 'Instructions')
 
 #Select .csv file for analysis 
 File = sg.popup_get_file('Please select the .csv file for analyzing')
 data = pd.read_csv(File, header = 0, keep_default_na = False)
 
 #data = pd.read_csv('C:/Users/julie/GitHub/Validation/VelocityDataNew.csv',header = 0,
-                 #  keep_default_na = False) #Keep athlete 'NA' from becoming NaNs
+         #        keep_default_na = False) #Keep athlete 'NA' from becoming NaNs
 
 #Sorting the data by athlete and trial in ascending order
 data.sort_values(['Athlete', 'Trial'], inplace = True, ascending = [True, True])
@@ -44,24 +44,22 @@ NewData.reset_index(inplace = True)
 #Visualizing data 
 import matplotlib.pyplot as plt
 fig1, axes = plt.subplots(2, figsize =(20,15))
-fig1.suptitle('Instantaneous and Average Max Velocities')
-NewData.plot(x = "Athlete", y = ["Radar_Max", "TimingGate_Max", "Optojump_Max"],
-             kind = "bar", ax = axes[0], title = 'Instantaneous', rot = 45,
-             legend = False, cmap = "Accent")
-NewData.plot(x = "Athlete", y = ["Radar_Avg", "TimingGate_Avg", "Optojump_Avg"], 
-             kind = "bar", ax = axes[1], title = 'Average', rot = 45,
-             legend = False, cmap = "Accent")
-
-font = {'family': 'DejaVu Sans',
-        'weight': 'normal',
-        'size' : 20}
-plt.rc('font', **font)
-fig1.legend(['Radar', 'Timing Gate', 'Optojump'], loc = 'upper right', frameon = False)
+fig1.suptitle('Instantaneous and Average Max Velocities', fontweight = "bold", size = 30)
+NewData.plot(x = "Athlete", y = ["Radar_Max", "TimingGate_Max", "Optojump_Max"], ax = axes[0],
+             kind = "bar", title = 'Instantaneous', rot = 45,
+             legend = False, cmap = "Accent", fontsize = 26)
+NewData.plot(x = "Athlete", y = ["Radar_Avg", "TimingGate_Avg", "Optojump_Avg"], ax = axes[1],
+             kind = "bar", title = 'Average', rot = 45,
+             legend = False, cmap = "Accent", fontsize = 26)
+fig1.legend(['Radar', 'Timing Gate', 'Optojump'], loc = 'upper right', frameon = False, fontsize = 26)
 fig1.savefig('Max and avg velocity plot', bbox_inches = 'tight')
+
 for ax in axes.flat:
-    ax.set(xlabel = 'Athlete', ylabel = 'Velocity (m/s)')
+    ax.set_ylabel('Velocity (m/s)', fontsize = 26)
+    ax.set_xlabel('Athlete', fontsize = 26)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    ax.title.set_size(26)
 for ax in axes.flat:
     ax.label_outer()
 
