@@ -19,6 +19,15 @@ sg.theme('LightBlue2')
 
 sg.popup_ok('The following program was designed to analyze athlete data for the validation of timing gates', 
             title = 'Timing Gate Validation')
+sg.popup_ok_cancel('In order for this program to run, you need to have the following installations:',
+                   '- pip install numpy',
+                   '- pip install pandas',
+                   '- pip install pysimplegui',
+                   '- pip install matplotlib',
+                   '- pip install plotly',
+                   '- pip install pinguoin',
+                   '- pip install statsmodels',
+                   title = 'Instructions')
 sg.popup_ok_cancel('This program will prompt you to upload a .csv file. Follow these instructions carefully as everything is case sensitive! This file MUST be formatted in the following way:',
             ' - Five columns', ' - One row containing column names',
             ' - Column names: Athlete, Trial, Radar, TimingGate, Optojump',
@@ -43,6 +52,7 @@ NewData.reset_index(inplace = True)
 
 #Visualizing data 
 import matplotlib.pyplot as plt
+
 fig1, axes = plt.subplots(2, figsize =(20,15))
 fig1.suptitle('Instantaneous and Average Max Velocities', fontweight = "bold", size = 30)
 NewData.plot(x = "Athlete", y = ["Radar_Max", "TimingGate_Max", "Optojump_Max"], ax = axes[0],
@@ -61,18 +71,25 @@ for ax in axes.flat:
     ax.title.set_size(26)
 for ax in axes.flat:
     ax.label_outer()
-plt.show()
 
+selectfolder = sg.popup_get_folder('Select a folder to save velocity bar plot')
+plt.savefig(selectfolder + '/Velocity bar plot.png')
+plt.show()
+    
 #Bland Altman plots
 import statsmodels.api as sm
 fig2, ax = plt.subplots(1, figsize = (8,5))
 sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Radar_Max'], ax = ax)
 plt.title('Timing Gate and Radar Bland Altman plot', fontsize = 18)
+selectfolder = sg.popup_get_folder('Select a folder to save Radar bland altman plot')
+plt.savefig(selectfolder + '/Radar bland altman plot.png')
 plt.show()   
 fig3, ax = plt.subplots(1, figsize = (8,5))
 sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Optojump_Max'], ax = ax)
 plt.title('Timing Gate and Optojump Bland Altman plot', fontsize = 18)
-plt.show()   
+selectfolder = sg.popup_get_folder('Select a folder to save Optojump bland altman plot')
+plt.savefig(selectfolder + '/Opto jump bland altman plot.png')
+plt.show()  
 
 #ICC table
 import pingouin as pg
@@ -102,20 +119,6 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 
-# fig4, ax = plt.subplots(figsize = (16, 2))
-# ax.axis('off')
-# ax.axis('tight')
-# ax.set_frame_on(False)
-
-# ax.table(cellText = iccRadar.values, 
-#           rowLabels = iccRadar.index,
-#           colLabels = iccRadar.columns,
-#           loc = "center")
-
-# ax.set_title("Timing and Radar ICC values")
-# fig4.tight_layout()
-
-
 table1 = ff.create_table(iccRadar)
 table2 = ff.create_table(iccOpto)
 fig = make_subplots(rows = 2, 
@@ -140,6 +143,7 @@ fig.layout.annotations = all_annots
 fig.layout.update(width=800, height=600, margin=dict(t=100, l=50, r=50, b=50));
 
 plot(fig, auto_open = True)
+
 
 
     
