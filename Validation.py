@@ -73,7 +73,7 @@ for ax in axes.flat:
     ax.label_outer()
 
 selectfolder = sg.popup_get_folder('Select a folder to save velocity bar plot')
-plt.savefig(selectfolder + '/Velocity bar plot.png')
+plt.savefig(selectfolder + '/Velocity bar plot.png', bbox_inches = 'tight')
 plt.show()
     
 #Bland Altman plots
@@ -82,13 +82,13 @@ fig2, ax = plt.subplots(1, figsize = (8,5))
 sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Radar_Max'], ax = ax)
 plt.title('Timing Gate and Radar Bland Altman plot', fontsize = 18)
 selectfolder = sg.popup_get_folder('Select a folder to save Radar bland altman plot')
-plt.savefig(selectfolder + '/Radar bland altman plot.png')
+plt.savefig(selectfolder + '/Radar bland altman plot.png',  bbox_inches='tight')
 plt.show()   
 fig3, ax = plt.subplots(1, figsize = (8,5))
 sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Optojump_Max'], ax = ax)
 plt.title('Timing Gate and Optojump Bland Altman plot', fontsize = 18)
 selectfolder = sg.popup_get_folder('Select a folder to save Optojump bland altman plot')
-plt.savefig(selectfolder + '/Opto jump bland altman plot.png')
+plt.savefig(selectfolder + '/Opto jump bland altman plot.png', bbox_inches='tight')
 plt.show()  
 
 #ICC table
