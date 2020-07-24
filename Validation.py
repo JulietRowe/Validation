@@ -17,24 +17,8 @@ get_ipython().magic('clear')
 #Popup window with instructions 
 sg.theme('LightBlue2')
 
-sg.popup_ok('The following program was designed to analyze athlete data for the validation of timing gates', 
-            title = 'Timing Gate Validation')
-sg.popup_ok_cancel('In order for this program to run, you need to have the following installations:',
-                   '- pip install numpy',
-                   '- pip install pandas',
-                   '- pip install pysimplegui',
-                   '- pip install matplotlib',
-                   '- pip install plotly',
-                   '- pip install pinguoin',
-                   '- pip install statsmodels',
-                   title = 'Instructions')
-sg.popup_ok_cancel('This program will prompt you to upload a .csv file. Follow these instructions carefully as everything is case sensitive! This file MUST be formatted in the following way:',
-            ' - Five columns', ' - One row containing column names',
-            ' - Column names: Athlete, Trial, Radar, TimingGate, Optojump',
-            title = 'Instructions')
-
 #Select .csv file for analysis 
-File = sg.popup_get_file('Please select the .csv file for analyzing')
+File = sg.popup_get_file('Please select the .csv file for analyzing', keep_on_top = True)
 data = pd.read_csv(File, header = 0, keep_default_na = False)
 
 # data = pd.read_csv('C:/Users/julie/GitHub/Validation/VelocityDataNew.csv',header = 0,
@@ -53,42 +37,37 @@ NewData.reset_index(inplace = True)
 #Visualizing data 
 import matplotlib.pyplot as plt
 
-fig1, axes = plt.subplots(2, figsize =(20,15))
-fig1.suptitle('Instantaneous and Average Max Velocities', fontweight = "bold", size = 30)
+fig1, axes = plt.subplots(2, figsize =(8,5), dpi = 300)
+fig1.suptitle('Instantaneous and Average Max Velocities', fontweight = "bold", size = 14)
 NewData.plot(x = "Athlete", y = ["Radar_Max", "TimingGate_Max", "Optojump_Max"], ax = axes[0],
              kind = "bar", title = 'Instantaneous', rot = 45,
-             legend = False, cmap = "Accent", fontsize = 26)
+             legend = False, cmap = "Accent", fontsize = 12)
 NewData.plot(x = "Athlete", y = ["Radar_Avg", "TimingGate_Avg", "Optojump_Avg"], ax = axes[1],
              kind = "bar", title = 'Average', rot = 45,
-             legend = False, cmap = "Accent", fontsize = 26)
-fig1.legend(['Radar', 'Timing Gate', 'Optojump'], loc = 'upper right', frameon = False, fontsize = 26)
+             legend = False, cmap = "Accent", fontsize = 12)
+fig1.legend(['Radar', 'Timing Gate', 'Optojump'], loc = 'upper right', frameon = False, fontsize = 10)
 
 for ax in axes.flat:
-    ax.set_ylabel('Velocity (m/s)', fontsize = 26)
-    ax.set_xlabel('Athlete', fontsize = 26)
+    ax.set_ylabel('Velocity (m/s)', fontsize = 12)
+    ax.set_xlabel('Athlete', fontsize = 12)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
-    ax.title.set_size(26)
+    ax.title.set_size(12)
 for ax in axes.flat:
     ax.label_outer()
 
-selectfolder = sg.popup_get_folder('Select a folder to save velocity bar plot')
-plt.savefig(selectfolder + '/Velocity bar plot.png', bbox_inches = 'tight')
 plt.show()
     
 #Bland Altman plots
 import statsmodels.api as sm
-fig2, ax = plt.subplots(1, figsize = (8,5))
+fig2, ax = plt.subplots(1, figsize = (8,5), dpi = 300)
 sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Radar_Max'], ax = ax)
 plt.title('Timing Gate and Radar Bland Altman plot', fontsize = 18)
-selectfolder = sg.popup_get_folder('Select a folder to save Radar bland altman plot')
-plt.savefig(selectfolder + '/Radar bland altman plot.png',  bbox_inches='tight')
-plt.show()   
-fig3, ax = plt.subplots(1, figsize = (8,5))
+plt.show()
+ 
+fig3, ax = plt.subplots(1, figsize = (8,5), dpi = 300)
 sm.graphics.mean_diff_plot(NewData['TimingGate_Max'], NewData['Optojump_Max'], ax = ax)
 plt.title('Timing Gate and Optojump Bland Altman plot', fontsize = 18)
-selectfolder = sg.popup_get_folder('Select a folder to save Optojump bland altman plot')
-plt.savefig(selectfolder + '/Opto jump bland altman plot.png', bbox_inches='tight')
 plt.show()  
 
 #ICC table
@@ -142,8 +121,18 @@ fig.layout.annotations = all_annots
 
 fig.layout.update(width=800, height=600, margin=dict(t=100, l=50, r=50, b=50));
 
-plot(fig, auto_open = True)
+#Save images and files
+selectfolder = sg.popup_get_folder('Select a folder to save all plots and files', keep_on_top = True)
+fig1.savefig(selectfolder + '/Velocity bar plot.tiff', bbox_inches = 'tight')
+fig2.savefig(selectfolder + '/Radar bland altman plot.tiff',  bbox_inches='tight')
+fig3.savefig(selectfolder + '/Opto jump bland altman plot.tiff', bbox_inches='tight') 
+fig.write_html(selectfolder + "/ICC tables.html")
 
+iccRadar.set_index('Type', inplace = True)
+iccOpto.set_index('Type', inplace = True)
+NewData.set_index('Athlete', inplace = True)
 
-
-    
+with pd.ExcelWriter(selectfolder + '/Analyzed Validation Data.xlsx') as writer:
+    iccRadar.to_excel(writer, sheet_name = 'ICC Radar data')
+    iccOpto.to_excel(writer, sheet_name = 'ICC Opto data')
+    NewData.to_excel(writer, sheet_name = 'Max velocities')
