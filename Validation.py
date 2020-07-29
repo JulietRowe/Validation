@@ -95,7 +95,6 @@ iccOpto = iccOpto.drop("Description", axis = 1)
 
 from plotly.offline import plot
 from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 import plotly.figure_factory as ff
 
 table1 = ff.create_table(iccRadar)
