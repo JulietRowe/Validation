@@ -5,7 +5,7 @@ Created on Tue Jul 14 14:03:45 2020
 @author: julie
 """
 
-from IPython import get_ipython
+#from IPython import get_ipython
 import pandas as pd
 import PySimpleGUI as sg
 import numpy as np
@@ -20,9 +20,6 @@ sg.theme('LightBlue2')
 #Select .csv file for analysis 
 File = sg.popup_get_file('Please select the .csv file for analyzing', keep_on_top = True)
 data = pd.read_csv(File, header = 0, keep_default_na = False)
-
-# data = pd.read_csv('C:/Users/julie/GitHub/Validation/VelocityDataNew.csv',header = 0,
-#                 keep_default_na = False) #Keep athlete 'NA' from becoming NaNs
 
 #Sorting the data by athlete and trial in ascending order
 data.sort_values(['Athlete', 'Trial'], inplace = True, ascending = [True, True])
