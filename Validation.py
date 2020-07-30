@@ -5,14 +5,9 @@ Created on Tue Jul 14 14:03:45 2020
 @author: julie
 """
 
-#from IPython import get_ipython
 import pandas as pd
 import PySimpleGUI as sg
 import numpy as np
-
-#Clear's console and variables
-get_ipython().magic('reset -f')
-get_ipython().magic('clear')
 
 #Popup window with instructions 
 sg.theme('LightBlue2')
